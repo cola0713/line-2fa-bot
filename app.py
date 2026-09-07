@@ -8,19 +8,20 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 app = Flask(__name__)
 
-# 1. 填入你的 LINE 金鑰
+# 1. LINE 金鑰
 LINE_CHANNEL_ACCESS_TOKEN = "9kluz2S3S0ozWaCpHDiaXcVLqBLP2R9fA2I32cAChJy83xYfX6Ag6hlmzf0LiKEqoV/mMTDxCNX38sQ6LufepQq9S7H8W2473WgsGULVASO+vKlnaIMnV6qeuNesscpZiBH0XXuA63E8Rt/ZnyasDwdB04t89/1O/w1cDnyilFU="
 LINE_CHANNEL_SECRET = "465c50ad6d658554cfac3b9c22b6ee71"
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-# 2. 填入 Google 2FA 16位數文字金鑰
-TOTP_SECRET_KEY = "2pir 3kwq dj4y zopn jcjg v6r4 lshv ohkq"
+# 2. Google 2FA 金鑰（自動去除空格並轉為大寫）
+RAW_SECRET = "2pir 3kwq dj4y zopn jcjg v6r4 lshv ohkq"
+TOTP_SECRET_KEY = RAW_SECRET.replace(" ", "").upper()
 
 @app.route("/callback", methods=['POST'])
 def callback():
-    signature = request.headers['X-Line-Signature']
+    signature = request.headers.get('X-Line-Signature', '')
     body = request.get_data(as_text=True)
 
     try:
@@ -38,7 +39,7 @@ def handle_message(event):
         totp = pyotp.TOTP(TOTP_SECRET_KEY)
         current_code = totp.now()
         
-        # 使用 Python 內建的 time.time() 計算剩餘秒數，避免 pyotp 屬性錯誤
+        # 計算 30 秒倒數剩餘秒數
         time_remaining = 30 - (int(time.time()) % 30)
 
         reply_text = f"🔑 Google 最新驗證碼：\n\n{current_code}\n\n⏱️ 剩餘有效時間：{time_remaining} 秒"
