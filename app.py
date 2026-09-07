@@ -16,7 +16,7 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
 # 2. Google 2FA 金鑰（自動去除空格並轉為大寫）
-RAW_SECRET = "47xw 32zg fmjz bykh 675t ai5p vbfn xshi"
+RAW_SECRET = "7uup dnrp n7wc dbjo ykk2 e4mi ng7n uq3r"
 TOTP_SECRET_KEY = RAW_SECRET.replace(" ", "").upper()
 
 @app.route("/callback", methods=['POST'])
